@@ -1,6 +1,7 @@
-
 import sys
+import pyautogui
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 # from tbselenium.tbdriver import TorBrowserDriver
 import time
 import random
@@ -8,10 +9,11 @@ from lxml import etree
 import urllib.request
 import traceback
 
-##通过搜狗top热搜榜单收集热搜词
+
+## 通过搜狗top热搜榜单收集热搜词
 def getKeywords():
     url = "http://top.sogou.com/"
-    webPage=urllib.request.urlopen(url)
+    webPage = urllib.request.urlopen(url)
     html = webPage.read().decode('utf-8')
     # print("html:" + html)
     html = etree.HTML(html)
@@ -29,6 +31,7 @@ def getKeywords():
 ##  对于谷歌：
 #       全格式支持 需要注意的是 对于tar系列格式 比如tar.gz 只使用gz作为filetype即可 使用tar.gz反而不行
 
+
 def getFile(driver, keyword, engine, filetype=0):
     start1 = time.time()
     if engine == "baidu":
@@ -41,15 +44,20 @@ def getFile(driver, keyword, engine, filetype=0):
             driver.find_element_by_id("kw").send_keys(keyword)
             driver.find_element_by_id("su").click()
             # time.sleep(2)
-            rand_num = random.randrange(1, 11) # 1 - 10
+            rand_num = random.randrange(1, 11)  # 1 - 10
             print("randnum is: " + str(rand_num))
-            sreach_window=driver.current_window_handle
+            sreach_window = driver.current_window_handle
             print(driver.current_window_handle)
-            print("//div[@id='content_left']//div[@id='" +  str(rand_num) + "']/h3/a")
-            time.sleep(2) ##依据网速调整
+            print("//div[@id='content_left']//div[@id='" + str(rand_num) +
+                  "']/h3/a")
+            time.sleep(2)  ##依据网速调整
 
             ##模拟随机点击搜索结果
-            driver.find_element_by_xpath("//div[@id='content_left']//div[@id='" +  str(rand_num) + "']/h3/a").click()
+            driver.find_element_by_xpath(
+                "//div[@id='content_left']//div[@id='" + str(rand_num) +
+                "']/h3/a").click()
+
+            ##添加tor按键模拟
 
             driver.back()
 
@@ -72,8 +80,24 @@ def getFile(driver, keyword, engine, filetype=0):
             time.sleep(2)
 
             ##随机点击结果
-            rand_num = random.randrange(1, 11) # 1 - 10
-            driver.find_element_by_xpath("//div[@class='srg']/div[" +  str(rand_num) + "]//h3/a").click()
+            rand_num = random.randrange(1, 11)  # 1 - 10
+            driver.find_element_by_xpath("//div[@class='srg']/div[" +
+                                         str(rand_num) + "]//h3/a").click()
+            time.sleep(2)
+
+            ##针对tor模拟按键
+            pyautogui.hotkey("tab")
+            pyautogui.hotkey("enter")
+            time.sleep(0.5)
+
+            pyautogui.hotkey("tab")
+            pyautogui.hotkey("enter")
+            time.sleep(0.5)
+            pyautogui.hotkey("enter")
+
+            time.sleep(0.5)
+            pyautogui.hotkey("enter")
+
             driver.back()
 
             time.sleep(2)
@@ -82,10 +106,10 @@ def getFile(driver, keyword, engine, filetype=0):
             print(e)
             traceback.print_exc()
 
-
     else:
         print("[ERROR] 请选择正确的搜索引擎")
         return
+
 
 if __name__ == "__main__":
 
@@ -102,7 +126,6 @@ if __name__ == "__main__":
         print("[ERROR] 命令行参数错误")
         sys.exit()
 
-
     ##获取通用文件:
     #   参数格式: webdriver keyword 搜索引擎名称 文件类型
     # 通过filetype高级搜索相关关键词的文件 默认没有filetype 也即查看普通网页
@@ -111,9 +134,30 @@ if __name__ == "__main__":
     ##  对于谷歌：
     #       全格式支持 需要注意的是 对于tar系列格式 比如tar.gz 只使用gz作为filetype即可 使用tar.gz反而不行
 
+    firefox_profile = webdriver.FirefoxProfile()
+    firefox_profile.set_preference('browser.preferences.instantApply', True)
+    firefox_profile.set_preference('browser.helperApps.alwaysAsk.force', False)
+    firefox_profile.set_preference('browser.download.manager.showWhenStarting', False)
+    firefox_profile.set_preference('browser.download.folderList', 0)
+    firefox_profile.set_preference('browser.startup.homepage', "http://baidu.com")
+    firefox_profile.update_preferences()
+    options = Options()
+    # options.add_argument("-new-tab")
+    # options.add_argument('-headless')
+
     loop_times = 10
     for i in range(loop_times):
-        driver = webdriver.Chrome(executable_path=r"D:\chromeDriver\chromedriver.exe")
+        # driver = webdriver.Chrome(executable_path=r"D:\chromeDriver\chromedriver.exe")
+
+        driver = webdriver.Firefox(firefox_profile=firefox_profile,
+            executable_path=r"D:\chromeDriver\geckodriver.exe")
+        driver.get("http://baidu.com")
+
+        # driver = webdriver.Chrome(executable_path=r"/opt/google/chrome/chrome --no-sandbox")
+        # driver = webdriver.Chrome(executable_path=r"/home/ee/Tor/chromedriver")
+        # driver = TorBrowserDriver("/home/ee/Documents/tor-browser_en-US/")
+
+        time.sleep(10)
         keywords = getKeywords()
         print(keywords)
         print(len(keywords))

@@ -1,0 +1,3 @@
+如何在linux命令行无界面下，使用selenium进行自动化测试:
+安装 Xvfb 和 pyvirtualdisplay，后者依赖于前者
+在windows下测试，是不需要这个的，在linux下部署时再添加上

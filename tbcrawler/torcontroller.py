@@ -11,7 +11,7 @@ from tbselenium.common import DEFAULT_TOR_DATA_PATH, DEFAULT_TOR_BINARY_PATH
 import common as cm
 import utils as ut
 
-
+# 缺少close_stream这种控制 目前只能重复打开浏览器 以断开流
 class TorController(object):
     def __init__(self,
                  tbb_path=None,

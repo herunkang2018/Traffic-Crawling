@@ -2,7 +2,6 @@ import os
 import subprocess
 import time
 import psutil
-
 import common as cm
 import utils as ut
 from log import wl_log
@@ -41,7 +40,8 @@ class Sniffer(object):
         if pcap_path:
             self.set_pcap_path(pcap_path)
         prefix = ""
-        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i eth0 -s 0 -f \'{}\' -w {}'\
+        # 修改eth0为本地测试接口WLAN
+        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i WLAN -s 0 -f \"{}\" -w {}'\
             .format(prefix, cm.SOFT_VISIT_TIMEOUT, cm.MAX_DUMP_SIZE,
                     self.pcap_filter, self.pcap_file)
         wl_log.info(command)

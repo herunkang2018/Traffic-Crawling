@@ -66,7 +66,7 @@ def add_symlink(linkname, src_file):
     try:
         os.symlink(src_file, linkname)
     except:
-        print "Cannot create symlink!"
+        print("Cannot create symlink!")
 
 
 wl_log = get_logger(LOG_PREFIX, logtype='c')

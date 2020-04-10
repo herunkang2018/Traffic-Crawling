@@ -1,5 +1,6 @@
 import argparse
-import ConfigParser
+# import ConfigParser
+import configparser
 import sys
 import traceback
 from contextlib import contextmanager
@@ -8,17 +9,20 @@ from os import stat, chdir
 from os.path import isfile, join, basename
 from shutil import copyfile
 from sys import maxsize, argv
-from urlparse import urlparse
+# from urlparse import urlparse
+from urllib.parse import urlparse
 
-from tbselenium.tbdriver import TorBrowserDriver
-from tbselenium.common import USE_RUNNING_TOR
+# from tbselenium.tbdriver import TorBrowserDriver
+# from tbselenium.common import USE_RUNNING_TOR
+from selenium import webdriver
 
 import common as cm
 import utils as ut
+import common as cm
 import crawler as crawler_mod
 from log import add_log_file_handler
 from log import wl_log, add_symlink
-from torcontroller import TorController
+# from torcontroller import TorController
 
 
 def run():
@@ -31,34 +35,48 @@ def run():
     # Read URLs
     url_list = parse_url_list(args.url_file, args.start, args.stop)
     host_list = [urlparse(url).hostname for url in url_list]
+    print(url_list)
 
     # Configure logger
     add_log_file_handler(wl_log, cm.DEFAULT_CRAWL_LOG)
 
     # Configure controller
-    torrc_config = ut.get_dict_subconfig(config, args.config, "torrc")
-    controller = TorController(cm.TBB_DIR,
-                               torrc_dict=torrc_config,
-                               pollute=False)
+    # torrc_config = ut.get_dict_subconfig(config, args.config, "torrc")
 
-    # Configure browser
+    # Configure browser 这里对所控制的浏览器进行特定的配置 减少背景流量
+    # 修改为webdriver.Firefox(firefox_profile)
+    # 去掉所有与tor相关的功能 去掉xvfb虚拟显示相关
     ffprefs = ut.get_dict_subconfig(config, args.config, "ffpref")
-    driver = TorBrowserWrapper(cm.TBB_DIR,
-                               tbb_logfile_path=cm.DEFAULT_FF_LOG,
-                               tor_cfg=USE_RUNNING_TOR,
-                               pref_dict=ffprefs,
-                               socks_port=int(torrc_config['socksport']))
+    print(ffprefs)
+
+    # using firefox_options to store it
+    firefox_profile = webdriver.FirefoxProfile()
+    for pref in ffprefs:
+        firefox_profile.set_preference(pref, ffprefs[pref])
+
+    driver = BrowserWrapper(firefox_profile=firefox_profile,
+        executable_path=r"D:\chromeDriver\geckodriver.exe")
+
+    # driver = TorBrowserWrapper(cm.TBB_DIR,
+    #                            tbb_logfile_path=cm.DEFAULT_FF_LOG,
+    #                            tor_cfg=USE_RUNNING_TOR,
+    #                            pref_dict=ffprefs,
+    #                            socks_port=int(torrc_config['socksport']))
 
     # Instantiate crawler
+    # 此处使用Base：CrawlerBase
     crawl_type = getattr(crawler_mod, "Crawler" + args.type)
-    crawler = crawl_type(driver, controller, args.screenshots)
+    # 传递driver和controller给crawler
+    # 默认参数screenshots是False
+    # 去掉controller
+    crawler = crawl_type(driver)
 
     # Configure crawl
     job_config = ut.get_dict_subconfig(config, args.config, "job")
     job = crawler_mod.CrawlJob(job_config, url_list)
 
     # Run display
-    xvfb_display = setup_virtual_display(args.virtual_display)
+    # xvfb_display = setup_virtual_display(args.virtual_display)
 
     # Run the crawl
     chdir(cm.CRAWL_DIR)
@@ -72,7 +90,7 @@ def run():
         post_crawl()
 
         # Close display
-        ut.stop_xvfb(xvfb_display)
+        # ut.stop_xvfb(xvfb_display)
 
     # die
     sys.exit(0)
@@ -114,7 +132,8 @@ def parse_url_list(file_path, start, stop):
 
 def parse_arguments():
     # Read configuration file
-    config = ConfigParser.RawConfigParser()
+    # config = ConfigParser.RawConfigParser()
+    config = configparser.ConfigParser()
     config.read(cm.CONFIG_FILE)
 
     # Parse arguments
@@ -127,7 +146,7 @@ def parse_arguments():
     parser.add_argument('-t', '--type',
                         choices=cm.CRAWLER_TYPES,
                         help="Crawler type to use for this crawl.",
-                        default='Base')
+                        default='Base') # 默认使用Base模式
     parser.add_argument('-o', '--output',
                         help='Directory to dump the results (default=./results).',
                         default=cm.CRAWL_DIR)
@@ -173,7 +192,7 @@ def parse_arguments():
     return args, config
 
 
-class TorBrowserWrapper(object):
+class BrowserWrapper(object):
     """Wraps the TorBrowserDriver to configure it at the constructor
     and run it with the `launch` method.
 
@@ -196,8 +215,10 @@ class TorBrowserWrapper(object):
 
     @contextmanager
     def launch(self):
-        self.driver = TorBrowserDriver(*self.args, **self.kwargs)
-        yield self.driver
+        # 接收ffprefs来自动配置浏览器
+        # launch之后 driver被初始化 之后就可以使用driver.get
+        self.driver = webdriver.Firefox(*self.args, **self.kwargs)
+        yield self.driver # yield: 在上下文中使用driver
         self.driver.quit()
 
 
