@@ -22,9 +22,11 @@ import common as cm
 import crawler as crawler_mod
 from log import add_log_file_handler
 from log import wl_log, add_symlink
+
 # from torcontroller import TorController
 
 
+# 执行顺序
 def run():
     # build dirs
     build_crawl_dirs()
@@ -49,14 +51,10 @@ def run():
     ffprefs = ut.get_dict_subconfig(config, args.config, "ffpref")
     print(ffprefs)
 
-    # using firefox_options to store it
-    firefox_profile = webdriver.FirefoxProfile()
-    for pref in ffprefs:
-        firefox_profile.set_preference(pref, ffprefs[pref])
-
-    driver = BrowserWrapper(firefox_profile=firefox_profile,
-        executable_path=r"D:\chromeDriver\geckodriver.exe")
-
+    # driver = BrowserWrapper(firefox_profile=firefox_profile,
+    # executable_path=r"D:\chromeDriver\geckodriver.exe")
+    driver = BrowserWrapper(executable_path=r"D:\chromeDriver\geckodriver.exe",
+                            ffprefs=ffprefs)
     # driver = TorBrowserWrapper(cm.TBB_DIR,
     #                            tbb_logfile_path=cm.DEFAULT_FF_LOG,
     #                            tor_cfg=USE_RUNNING_TOR,
@@ -95,11 +93,13 @@ def run():
     # die
     sys.exit(0)
 
+
 def setup_virtual_display(virt_display):
     """Start a virtual display with the given dimensions (if requested)."""
     if virt_display:
         w, h = (int(dim) for dim in virt_display.lower().split("x"))
         return ut.start_xvfb(w, h)
+
 
 def post_crawl():
     """Operations after the crawl."""
@@ -126,7 +126,8 @@ def parse_url_list(file_path, start, stop):
             url_list = file_contents.splitlines()
             url_list = url_list[start - 1:stop]
     except Exception as e:
-        ut.die("ERROR: while parsing URL list: {} \n{}".format(e, traceback.format_exc()))
+        ut.die("ERROR: while parsing URL list: {} \n{}".format(
+            e, traceback.format_exc()))
     return url_list
 
 
@@ -137,45 +138,64 @@ def parse_arguments():
     config.read(cm.CONFIG_FILE)
 
     # Parse arguments
-    parser = argparse.ArgumentParser(description='Crawl a list of URLs in multiple batches.')
+    parser = argparse.ArgumentParser(
+        description='Crawl a list of URLs in multiple batches.')
 
     # List of urls to be crawled
-    parser.add_argument('-u', '--url-file', required=True,
-                        help='Path to the file that contains the list of URLs to crawl.',
-                        default=cm.LOCALIZED_DATASET)
-    parser.add_argument('-t', '--type',
+    parser.add_argument(
+        '-u',
+        '--url-file',
+        required=True,
+        help='Path to the file that contains the list of URLs to crawl.',
+        default=cm.LOCALIZED_DATASET)
+    parser.add_argument('-t',
+                        '--type',
                         choices=cm.CRAWLER_TYPES,
                         help="Crawler type to use for this crawl.",
-                        default='Base') # 默认使用Base模式
-    parser.add_argument('-o', '--output',
-                        help='Directory to dump the results (default=./results).',
-                        default=cm.CRAWL_DIR)
-    parser.add_argument('-c', '--config',
-                        help="Crawler tor driver and controller configurations.",
-                        choices=config.sections(),
-                        default="default")
-    parser.add_argument('-b', '--tbb-path',
+                        default='Base')  # 默认使用Base模式
+    parser.add_argument(
+        '-o',
+        '--output',
+        help='Directory to dump the results (default=./results).',
+        default=cm.CRAWL_DIR)
+    parser.add_argument(
+        '-c',
+        '--config',
+        help="Crawler tor driver and controller configurations.",
+        choices=config.sections(),
+        default="default")
+    parser.add_argument('-b',
+                        '--tbb-path',
                         help="Path to the Tor Browser Bundle directory.",
                         default=cm.TBB_DIR)
-    parser.add_argument('-v', '--verbose', action='store_true',
+    parser.add_argument('-v',
+                        '--verbose',
+                        action='store_true',
                         help='increase output verbosity',
                         default=False)
 
     # Crawler features
-    parser.add_argument('-x', '--virtual-display',
+    parser.add_argument('-x',
+                        '--virtual-display',
                         help='Dimensions of the virtual display, eg 1200x800',
                         default='')
-    parser.add_argument('-s', '--screenshots', action='store_true',
+    parser.add_argument('-s',
+                        '--screenshots',
+                        action='store_true',
                         help='Capture page screenshots',
                         default=False)
 
     # Limit crawl
-    parser.add_argument('--start', type=int,
-                        help='Select URLs from this line number: (default: 1).',
-                        default=1)
-    parser.add_argument('--stop', type=int,
-                        help='Select URLs after this line number: (default: EOF).',
-                        default=maxsize)
+    parser.add_argument(
+        '--start',
+        type=int,
+        help='Select URLs from this line number: (default: 1).',
+        default=1)
+    parser.add_argument(
+        '--stop',
+        type=int,
+        help='Select URLs after this line number: (default: EOF).',
+        default=maxsize)
 
     # Parse arguments
     args = parser.parse_args()
@@ -201,9 +221,10 @@ class BrowserWrapper(object):
     used to launch driver/controller, and this method is the one used
     to implement the contextmanager.
     """
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
+    def __init__(self, executable_path, ffprefs):
+        # 保存传递的参数
+        self.ffprefs = ffprefs
+        self.executable_path = executable_path
         self.driver = None
 
     def __getattr__(self, item):
@@ -217,8 +238,15 @@ class BrowserWrapper(object):
     def launch(self):
         # 接收ffprefs来自动配置浏览器
         # launch之后 driver被初始化 之后就可以使用driver.get
-        self.driver = webdriver.Firefox(*self.args, **self.kwargs)
-        yield self.driver # yield: 在上下文中使用driver
+
+        # using firefox_options to store it
+        firefox_profile = webdriver.FirefoxProfile()
+        for pref in self.ffprefs:
+            firefox_profile.set_preference(pref, self.ffprefs[pref])
+
+        self.driver = webdriver.Firefox(executable_path=self.executable_path,
+                                        firefox_profile=firefox_profile)
+        yield self.driver  # yield: 在上下文中使用driver
         self.driver.quit()
 
 

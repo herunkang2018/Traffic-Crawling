@@ -51,6 +51,7 @@ class CrawlerBase(object):
             wl_log.info("*** Visit #%s to %s ***", self.job.visit, self.job.url)
             # BrowserWrapper开始实际地构造一个driver对象
             # __enter__开启一个新浏览器 和 __exit__时退出
+            # 问题：每次driver.quit()后 新开启的driver会重用之前临时创建的profile
             with self.driver.launch():
                 try:
                     self.driver.set_page_load_timeout(cm.SOFT_VISIT_TIMEOUT)
@@ -68,8 +69,9 @@ class CrawlerBase(object):
     def __do_visit(self):
         with Sniffer(path=self.job.pcap_file, filter=cm.DEFAULT_FILTER):
             sleep(1)  # make sure dumpcap is running
-            try:
+            try: # 此处必须在linux下测试
                 with ut.timeout(cm.HARD_VISIT_TIMEOUT):
+                    print("++++++visit:+++++ ", self.job.url)
                     self.driver.get(self.job.url)
                     sleep(float(self.job.config['pause_in_site']))
             except (cm.HardTimeoutException, TimeoutException):
@@ -93,7 +95,7 @@ class CrawlerWebFP(CrawlerBase):
 class CrawlerMultitab(CrawlerWebFP):
     pass
 
-
+# 对config和urls的封装
 class CrawlJob(object):
     def __init__(self, config, urls):
         self.urls = urls
@@ -124,6 +126,7 @@ class CrawlJob(object):
 
     @property
     def path(self):
+        # 构造pcap保存路径
         attributes = [self.batch, self.site, self.instance]
         return join(cm.CRAWL_DIR, "_".join(map(str, attributes)))
 
