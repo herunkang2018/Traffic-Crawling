@@ -67,7 +67,7 @@ class CrawlerBase(object):
             self.post_visit()
 
     def __do_visit(self):
-        with Sniffer(path=self.job.pcap_file, filter=cm.DEFAULT_FILTER):
+        with Sniffer(path=self.job.pcap_file, filter=cm.DEFAULT_FILTER,     netif=self.job.config['interface']):
             sleep(1)  # make sure dumpcap is running
             try: # 此处必须在linux下测试
                 with ut.timeout(cm.HARD_VISIT_TIMEOUT):

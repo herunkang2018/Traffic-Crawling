@@ -40,8 +40,8 @@ class Sniffer(object):
         if pcap_path:
             self.set_pcap_path(pcap_path)
         prefix = ""
-        # 修改eth0为本地测试接口WLAN
-        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i WLAN -s 0 -f \"{}\" -w {}'\
+        # 修改eth0为本地测试接口WLAN 写成配置文件
+        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i ens33 -s 0 -f \"{}\" -w {}'\
             .format(prefix, cm.SOFT_VISIT_TIMEOUT, cm.MAX_DUMP_SIZE,
                     self.pcap_filter, self.pcap_file)
         wl_log.info(command)

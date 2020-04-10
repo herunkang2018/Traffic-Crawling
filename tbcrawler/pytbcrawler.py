@@ -134,6 +134,7 @@ def parse_url_list(file_path, start, stop):
     return url_list
 
 
+# 添加对新加参数的解析
 def parse_arguments():
     # Read configuration file
     # config = ConfigParser.RawConfigParser()
