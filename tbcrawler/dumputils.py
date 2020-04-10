@@ -12,9 +12,10 @@ DUMPCAP_START_TIMEOUT = 10.0
 class Sniffer(object):
     """Capture network traffic using dumpcap."""
 
-    def __init__(self, path="/dev/null", filter=""):
+    def __init__(self, path="/dev/null", filter="", netif="eth0"):
         self.pcap_file = path
         self.pcap_filter = filter
+        self.netif = netif
         self.p0 = None
         self.is_recording = False
 
@@ -41,9 +42,9 @@ class Sniffer(object):
             self.set_pcap_path(pcap_path)
         prefix = ""
         # 修改eth0为本地测试接口WLAN 写成配置文件
-        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i ens33 -s 0 -f \"{}\" -w {}'\
+        command = '{}dumpcap -P -a duration:{} -a filesize:{} -i {} -s 0 -f \"{}\" -w {}'\
             .format(prefix, cm.SOFT_VISIT_TIMEOUT, cm.MAX_DUMP_SIZE,
-                    self.pcap_filter, self.pcap_file)
+                    self.netif, self.pcap_filter, self.pcap_file)
         wl_log.info(command)
         self.p0 = subprocess.Popen(command, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, shell=True)
