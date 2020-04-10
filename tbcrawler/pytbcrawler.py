@@ -55,8 +55,9 @@ def run():
     # executable_path=r"D:\chromeDriver\geckodriver.exe")
     # driver = BrowserWrapper(executable_path=r"D:\chromeDriver\geckodriver.exe",
     #                         ffprefs=ffprefs)
-    driver = BrowserWrapper(executable_path=r"/root/traffic/geckodriver",
-                            ffprefs=ffprefs)
+
+    driver = BrowserWrapper(executable_path=r"/home/runking/traffic/geckodriver",ffprefs=ffprefs)
+
     # driver = TorBrowserWrapper(cm.TBB_DIR,
     #                            tbb_logfile_path=cm.DEFAULT_FF_LOG,
     #                            tor_cfg=USE_RUNNING_TOR,
