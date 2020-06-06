@@ -32,4 +32,11 @@ docker version:
 测试：
 docker build -t tbcrawl --rm .
 docker run -d --name tbcrawler tbcrawl:latest
+docker run -it --name tbcrawler tbcrawl:latest /bin/bash
 docker exec -it tbcrawler /bin/bash
+
+如果要正常退出不关闭容器，请按Ctrl+P+Q进行退出容器
+
+git clone https://github.com/hackeryard/Traffic-Crawling.git
+
+python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg

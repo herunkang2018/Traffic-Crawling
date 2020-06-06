@@ -19,6 +19,7 @@ RUN apt-get clean \
 # Install python3 requirements.
 RUN pip3 install --upgrade pip
 RUN pip3 install requests
+RUN pip3 install -r requirements.txt
 
 # add host user to container
 RUN adduser --system --group --disabled-password --gecos '' --shell /bin/bash docker
