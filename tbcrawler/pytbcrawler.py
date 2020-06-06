@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 # from tbselenium.tbdriver import TorBrowserDriver
 # from tbselenium.common import USE_RUNNING_TOR
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 import common as cm
 import utils as ut
@@ -248,8 +249,12 @@ class BrowserWrapper(object):
         for pref in self.ffprefs:
             firefox_profile.set_preference(pref, self.ffprefs[pref])
 
+        # 配置headless
+        options = FirefoxOptions()
+        options.add_argument("--headless")
         self.driver = webdriver.Firefox(executable_path=self.executable_path,
-                                        firefox_profile=firefox_profile)
+                                        firefox_profile=firefox_profile,
+                                        options=options)
         yield self.driver  # yield: 在上下文中使用driver
         self.driver.quit()
 
