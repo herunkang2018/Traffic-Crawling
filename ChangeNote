@@ -6,7 +6,9 @@ D:\Python\lib\site-packages\selenium\webdriver\firefox\firefox_profile.py
 
 按照要求消除浏览器自带的流量和系统自带的基础通信流量：
 1.浏览器更新流量：amazon(ec数据中心) cloudfront(amazon的cdn) akamai
-替换/usr/bin/firefox -> ../lib/firefox/firefox.sh
+自带：/usr/bin/firefox -> ../lib/firefox/firefox.sh
+替换为旧版本55的bin：
+https://ftp.mozilla.org/pub/firefox/releases/55.0.1/linux-x86_64/en-US/firefox-55.0.1.tar.bz2
 
 命令执行：
 python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
@@ -19,5 +21,11 @@ python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
 目前只能使用下一步 尽量维护一个ip池
 211.91.241.253 这个是alicdn的服务器 但chinaz查询不到
 解析 然后匹配ali 如果完全不是 则舍弃 否则保留
+或：手动去掉amazon的服务（有ptr记录，且记录为相关的，都丢弃）
 
-查看论文whois
+查看论文whois：策略实现困难 当前有ip2location的api 但查询不到域名的信息
+因为域名是ISP提供的，服务器是云服务商提供的，查域名只能查到ISP
+
+docker version:
+/bin/geckodriver
+/bin/firefox/firefox
