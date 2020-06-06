@@ -22,7 +22,7 @@ VOLUMES = \
 	--volume=${HOST_SSH}:${GUEST_SSH}			\
 	--volume=`pwd`:${CRAWL_PATH}				\
 
-PARAMS=-c wang_and_goldberg -t WebFP -u ./etc/localized-urls-100-top.csv -s
+PARAMS=-c wang_and_goldberg -u ./etc/localized-urls-100-top.csv -s
 
 build:
 	@docker build -t tbcrawl --rm .
