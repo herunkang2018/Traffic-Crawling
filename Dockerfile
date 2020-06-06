@@ -1,7 +1,7 @@
 # This dockerfile allows to run an crawl inside a docker container
 
 # Pull base image.
-FROM debian:stable-slim
+FROM debian:buster-20200514
 
 # Install required packages.
 RUN apt-get update
