@@ -7,12 +7,9 @@ FROM debian:buster-20200514
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install sudo build-essential autoconf git zip unzip xz-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install libtool libevent-dev libssl-dev
-# RUN echo "\ndeb http://ftp.de.debian.org/debian testing main" >> /etc/apt/sources.list
-# RUN apt-get update
-# RUN DEBIAN_FRONTEND=noninteractive apt-get -t testing --assume-yes --yes install python3 python3-dev python3-setuptools python3-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install python3 python3-dev python3-setuptools python3-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install net-tools ethtool tshark libpcap-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install xvfb
+RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install xvfb vim
 RUN apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
