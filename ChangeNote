@@ -39,4 +39,7 @@ docker exec -it tbcrawler /bin/bash
 
 git clone https://github.com/hackeryard/Traffic-Crawling.git
 
+修改配置config.ini：
+job interface=eth0
+
 python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg

@@ -12,7 +12,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install libtool li
 # RUN DEBIAN_FRONTEND=noninteractive apt-get -t testing --assume-yes --yes install python3 python3-dev python3-setuptools python3-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install python3 python3-dev python3-setuptools python3-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install net-tools ethtool tshark libpcap-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install xvfb firefox-esr
+RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install xvfb
 RUN apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
