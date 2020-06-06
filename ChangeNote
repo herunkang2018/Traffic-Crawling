@@ -3,3 +3,5 @@
 在windows下测试，是不需要这个的，在linux下部署时再添加上
 问题调试：
 D:\Python\lib\site-packages\selenium\webdriver\firefox\firefox_profile.py
+
+按照要求消除浏览器自带的流量和系统自带的基础通信流量
