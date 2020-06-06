@@ -29,3 +29,7 @@ python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
 docker version:
 /bin/geckodriver
 /bin/firefox/firefox
+测试：
+docker build -t tbcrawl --rm .
+docker run -d --name tbcrawler tbcrawl:latest
+docker exec -it tbcrawler /bin/bash

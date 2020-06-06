@@ -7,15 +7,17 @@ FROM debian:stable-slim
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install sudo build-essential autoconf git zip unzip xz-utils
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install libtool libevent-dev libssl-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install python python-dev python-setuptools python-pip
+RUN echo "http://ftp.de.debian.org/debian testing main" >> /etc/apt/sources.list
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -t testing --assume-yes --yes install python3 python3-dev python3-setuptools python3-pip
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install net-tools ethtool tshark libpcap-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --yes install xvfb firefox-esr
 RUN apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Install python requirements.
-RUN pip install --upgrade pip
-RUN pip install requests
+# Install python3 requirements.
+RUN pip3 install --upgrade pip
+RUN pip3 install requests
 
 # add host user to container
 RUN adduser --system --group --disabled-password --gecos '' --shell /bin/bash docker
