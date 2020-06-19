@@ -14,6 +14,12 @@ https://ftp.mozilla.org/pub/firefox/releases/55.0.1/linux-x86_64/en-US/firefox-5
 路径：/home/runking/traffic/Traffic-Crawling/tbcrawler
 命令执行：
 python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
+默认配置：
+urls：42类
+batch：10
+visit：4
+每个batch会把所有url抓取一遍，每个url抓取visit次，作为一个instance
+流量保存在results：0_0_0：batch-0 url-0 visit-0
 
 步骤：
 1.过滤TLS
@@ -28,7 +34,7 @@ python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
 查看论文whois：策略实现困难 当前有ip2location的api 但查询不到域名的信息
 因为域名是ISP提供的，服务器是云服务商提供的，查域名只能查到ISP
 
-docker version:
+docker version（79服务器）:
 /bin/geckodriver
 /bin/firefox/firefox
 测试：
@@ -36,8 +42,10 @@ docker build -t tbcrawl --rm .
 docker run -d --name tbcrawler tbcrawl:latest
 docker run -it --name tbcrawler tbcrawl:latest /bin/bash
 docker exec -it tbcrawler /bin/bash
-
 如果要正常退出不关闭容器，请按Ctrl+P+Q进行退出容器
+
+路径：/root/Traffic-Crawling/tbcrawler
+
 
 git clone https://github.com/hackeryard/Traffic-Crawling.git
 
