@@ -69,9 +69,8 @@ def run():
     # 此处使用Base：CrawlerBase
     crawl_type = getattr(crawler_mod, "Crawler" + args.type)
     # 传递driver和controller给crawler
-    # 默认参数screenshots是False
-    # 去掉controller
-    crawler = crawl_type(driver)
+    # 去掉controller 去掉screenshots
+    crawler = crawl_type(driver, controller=False, screenshots=False)
 
     # Configure crawl
     job_config = ut.get_dict_subconfig(config, args.config, "job")

@@ -15,9 +15,9 @@ https://ftp.mozilla.org/pub/firefox/releases/55.0.1/linux-x86_64/en-US/firefox-5
 命令执行：
 python3 pytbcrawler.py -u ../etc/localized-urls-100-top.csv -c wang_and_goldberg
 默认配置：
-urls：42类
+urls：50类
 batch：10
-visit：4
+visit：5
 每个batch会把所有url抓取一遍，每个url抓取visit次，作为一个instance
 流量保存在results：0_0_0：batch-0 url-0 visit-0
 
